@@ -1,20 +1,19 @@
-EXEC=p1_exec
+EXEC=main
 
 CC=g++
-CFLAGS=-std=c++98 -I.
+CFLAGS=-std=c++11 `pkg-config gtkmm-3.0 --cflags`
+LDFLAGS=`pkg-config gtkmm-3.0 --libs` -lpthread
 
+all: $(EXEC)
 
-%.o: %.cpp
-	$(CC) -c $< $(CFLAGS)
+$(EXEC): main.o helper.o
+	$(CC) -o $(EXEC) main.o helper.o $(LDFLAGS)
 
-${EXEC}: main.o p1_process.o p1_threads.o
-	g++ -o ${EXEC} main.o p1_process.o p1_threads.o -I. -lpthread 
+main.o: main.cpp
+	$(CC) -c main.cpp $(CFLAGS)
 
-.PHONY: test
-test: ${EXEC}
-	python3 autograder.py
+helper.o: helper.cpp
+	$(CC) -c helper.cpp $(CFLAGS)
 
-.PHONY: clean
 clean:
-	rm -rf ./${EXEC}
-	rm -rf ./*.o
+	rm -f *.o $(EXEC)
